@@ -50,6 +50,7 @@
 
     window.define = function (name, deps, callback) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         defines.push([name, deps, callback]);
 
         oldRequire.call(window, deps, callback);
@@ -57,6 +58,34 @@
         defines.forEach(function (define) {
             oldDefine.apply(window, define);
         });
+=======
+        oldDefine.apply(window, arguments);
+        intellisense.logMessage('In define: ' + name);
+        if (!loadTimeId) {
+            //Wait for current script to finish executing, then
+            //call script load event handler for anything that has
+            //been waiting.
+            loadTimeId = setTimeout(function () {
+                loadTimeId = 0;
+                var scriptElements = document.getElementsByTagName("script");
+                intellisense.logMessage('in loadTimeout');
+                for (var i = 0; i < scriptElements.length; i++) {
+                    var script = scriptElements[i];
+                    var moduleName = moduleMap[script.src];
+                    intellisense.logMessage('SCRIPT: ' + script.src + ': ' + moduleName);
+                    if (moduleName) {
+                        intellisense.logMessage('herelTI');
+                        intellisense.logMessage(moduleName + '->' + script.src + ' has state: ' + script.readyState.toString());
+                        delete moduleMap[script.src];
+                        loadEvent.currentTarget = script;
+                        requirejs.onScriptLoad(loadEvent);
+                        //force the define to be active
+                        requirejs([moduleName]);
+                    }
+                }
+            }, 0);
+        }
+>>>>>>> refs/heads/defineonload
 =======
         oldDefine.apply(window, arguments);
         intellisense.logMessage('In define: ' + name);
